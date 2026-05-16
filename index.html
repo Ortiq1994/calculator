@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Installment Calc with Telegram</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --uzs-color: #2563eb;
+            --usd-color: #d97706;
+            --text-dark: #1e293b;
+            --card-bg: #ffffff;
+            --tg-color: #0088cc;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg); 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            padding: 40px 20px;
+        }
+
+        .container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
+            gap: 30px; 
+            width: 100%; 
+            max-width: 1100px; 
+            margin-bottom: 30px;
+        }
+
+        .calc-card { 
+            background: var(--card-bg); 
+            padding: 30px; 
+            border-radius: 24px; 
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            border-top: 6px solid #ddd;
+        }
+
+        .calc-card.uzs { border-top-color: var(--uzs-color); }
+        .calc-card.usd { border-top-color: var(--usd-color); }
+
+        h2 { margin: 0 0 25px 0; font-weight: 800; font-size: 1.5rem; color: var(--text-dark); text-align: center; }
+
+        .input-wrapper { margin-bottom: 30px; }
+
+        label { 
+            display: block; 
+            font-size: 0.85rem; 
+            font-weight: 600; 
+            color: #64748b; 
+            margin-bottom: 8px; 
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        input, select { 
+            width: 100%; 
+            padding: 15px; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 16px; 
+            font-size: 1.4rem; 
+            font-weight: 800; 
+            box-sizing: border-box; 
+            outline: none; 
+            text-align: center;
+            background: #fcfcfd;
+            color: var(--text-dark);
+        }
+
+        input:focus, select:focus { border-color: #cbd5e1; background: #fff; }
+
+        .results { display: flex; flex-direction: column; gap: 12px; }
+
+        .res-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 16px 20px; 
+            background: #f1f5f9; 
+            border-radius: 16px; 
+        }
+
+        .res-info { display: flex; flex-direction: column; }
+        .res-label { font-size: 0.95rem; font-weight: 700; color: #475569; }
+        .res-total { font-size: 0.8rem; color: #94a3b8; margin-top: 2px; }
+        .res-value { font-size: 1.3rem; font-weight: 800; text-align: right; }
+
+        .uzs .res-value { color: var(--uzs-color); }
+        .usd .res-value { color: var(--usd-color); }
+
+        .order-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 500px;
+            border-top: 6px solid var(--tg-color);
+        }
+
+        .form-group { margin-bottom: 15px; text-align: left; }
+        .form-group label { text-align: left; margin-bottom: 5px; }
+        .form-group input, .form-group select { font-size: 1rem; font-weight: 600; text-align: left; padding: 12px; }
+
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: var(--tg-color);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover { background: #0077b3; }
+        .status-msg { text-align: center; margin-top: 10px; font-weight: 600; font-size: 0.9rem; min-height: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- БЛОК СУМ -->
+    <div class="calc-card uzs">
+        <h2>Рассрочка UZS</h2>
+        <div class="input-wrapper">
+            <label>Цена товара</label>
+            <input type="text" id="input-uzs" placeholder="0" oninput="processInput(this, 'uzs')">
+        </div>
+        <div class="results">
+            <div class="res-item"><div class="res-info"><span class="res-label">3 месяца</span><span class="res-total" id="uzs-t3">Итого: 0 сум</span></div><div class="res-value" id="uzs-m3">0 сум</div></div>
+            <div class="res-item"><div class="res-info"><span class="res-label">6 месяцев</span><span class="res-total" id="uzs-t6">Итого: 0 сум</span></div><div class="res-value" id="uzs-m6">0 сум</div></div>
+            <div class="res-item"><div class="res-info"><span class="res-label">9 месяцев</span><span class="res-total" id="uzs-t9">Итого: 0 сум</span></div><div class="res-value" id="uzs-m9">0 сум</div></div>
+            <div class="res-item"><div class="res-info"><span class="res-label">12 месяцев</span><span class="res-total" id="uzs-t12">Итого: 0 сум</span></div><div class="res-value" id="uzs-m12">0 сум</div></div>
+        </div>
+    </div>
+
+    <!-- БЛОК USD -->
+    <div class="calc-card usd">
+        <h2>Рассрочка USD</h2>
+        <div class="input-wrapper">
+            <label>Цена товара ($)</label>
+            <input type="text" id="input-usd" placeholder="0" oninput="processInput(this, 'usd')">
+        </div>
+        <div class="results">
+            <div class="res-item"><div class="res-info"><span class="res-label">3 месяца</span><span class="res-total" id="usd-t3">Итого: 0 $</span></div><div class="res-value" id="usd-m3">0 $</div></div>
+            <div class="res-item"><div class="res-info"><span class="res-label">6 месяцев</span><span class="res-total" id="usd-t6">Итого: 0 $</span></div><div class="res-value" id="usd-m6">0 $</div></div>
+            <div class="res-item"><div class="res-info"><span class="res-label">9 месяцев</span><span class="res-total" id="usd-t9">Итого: 0 $</span></div><div class="res-value" id="usd-m9">0 $</div></div>
+            <div class="res-item"><div class="res-info"><span class="res-label">12 месяцев</span><span class="res-total" id="usd-t12">Итого: 0 $</span></div><div class="res-value" id="usd-m12">0 $</div></div>
+        </div>
+    </div>
+</div>
+
+<!-- ФОРМА ЗАЯВКИ -->
+<div class="order-card">
+    <h2>Оформить заявку</h2>
+    <form id="tg-form" onsubmit="sendToTelegram(event)">
+        <div class="form-group">
+            <label>Ваше имя</label>
+            <input type="text" id="client-name" placeholder="Имя Фамилия" required>
+        </div>
+        <div class="form-group">
+            <label>Телефон</label>
+            <input type="text" id="client-phone" value="+998 " oninput="maskPhone(this)" onkeydown="checkBackspace(event, this)" required>
+        </div>
+        <div class="form-group">
+            <label>Выбранные условия</label>
+            <select id="client-plan" required>
+                <option value="">Сначала введите сумму выше</option>
+            </select>
+        </div>
+        <button type="submit" class="btn-submit">Отправить в Telegram</button>
+        <div id="status" class="status-msg"></div>
+    </form>
+</div>
+
+<script>
+    // ⚠️ ВПИШИТЕ ВАШИ ДАННЫЕ СЮДА:
+    const TG_TOKEN = "8926304340:AAFjHnNdfDJEUHhzptHmKUYv9f4FwT8INgQ"; 
+    const TG_CHAT_ID = "1033880412";
+
+    let currentCalculations = {};
+
+    function maskPhone(input) {
+        if (!input.value.startsWith("+998 ")) input.value = "+998 ";
+        let matrix = "+998 (__) ___-__-__", i = 0;
+        let def = matrix.replace(/\D/g, ""), val = input.value.replace(/\D/g, "");
+        if (def.length >= val.length) val = def;
+        input.value = matrix.replace(/./g, function(a) {
+            return /[_\d]/.test(a) && i < val.length ? val.charAt(i++) : i >= val.length ? "" : a;
+        });
+    }
+
+    function checkBackspace(e, input) {
+        if (input.selectionStart <= 5 && (e.key === "Backspace" || e.key === "Delete")) e.preventDefault();
+    }
+
+    function processInput(el, type) {
+        let val = el.value.replace(/\s/g, '').replace(/\D/g, '');
+        el.value = val !== "" ? Number(val).toLocaleString('ru-RU') : "";
+        updateCalc(Number(val), type);
+    }
+
+    function updateCalc(price, type) {
+        const months = [3, 6, 9, 12];
+        const rates = { 3: 0.12, 6: 0.24, 9: 0.37, 12: 0.44 }; 
+        const suffix = type === 'uzs' ? ' сум' : ' $';
+
+        if(price > 0) {
+            const otherType = type === 'uzs' ? 'usd' : 'uzs';
+            document.getElementById(`input-${otherType}`).value = "";
+            months.forEach(m => {
+                document.getElementById(`${otherType}-m${m}`).innerText = '0' + (otherType === 'uzs' ? ' сум' : ' $');
+                document.getElementById(`${otherType}-t${m}`).innerText = 'Итого: 0';
+            });
+        }
+
+        const selectPlan = document.getElementById('client-plan');
+        selectPlan.innerHTML = '<option value="">-- Выберите период --</option>';
+
+        months.forEach(m => {
+            const mEl = document.getElementById(type + '-m' + m);
+            const tEl = document.getElementById(type + '-t' + m);
+
+            if (!price || price <= 0) {
+                mEl.innerText = '0' + suffix;
+                tEl.innerText = 'Итого: 0';
+                return;
+            }
+
+            let priceWithFee = 0;
+            if (type === 'uzs') {
+                let add = price <= 2000000 ? 50000 : (price <= 5000000 ? 100000 : 150000);
+                priceWithFee = price + add;
+            } else {
+                let r = price <= 2000000 ? 0.01 : (price <= 5000000 ? 0.015 : 0.02);
+                priceWithFee = price * (1 + r);
+            }
+
+            let exactTotal = priceWithFee * (1 + rates[m]);
+            let exactMonthly = exactTotal / m;
+            
+            let step = type === 'uzs' ? 5000 : 5;
+            let roundedMonthly = Math.ceil(exactMonthly / step) * step;
+            let finalTotal = roundedMonthly * m;
+
+            const mText = roundedMonthly.toLocaleString('ru-RU') + suffix;
+            const tText = finalTotal.toLocaleString('ru-RU') + suffix;
+
+            mEl.innerText = mText;
+            tEl.innerText = 'Итого: ' + tText;
+
+            const optionKey = `${m} мес. по ${mText} (Итого: ${tText})`;
+            currentCalculations[optionKey] = {
+                base: price.toLocaleString('ru-RU') + suffix,
+                months: m,
+                monthly: mText,
+                total: tText
+            };
+
+            let opt = document.createElement('option');
+            opt.value = optionKey;
+            opt.innerText = optionKey;
+            selectPlan.appendChild(opt);
+        });
+    }
+
+    function sendToTelegram(event) {
+        event.preventDefault();
+        const statusEl = document.getElementById('status');
+        
+        if(TG_TOKEN === "ВАШ_ТОКЕН_БОТА" || TG_TOKEN === "") {
+            statusEl.style.color = "red";
+            statusEl.innerText = "Ошибка: Укажите токен вашего бота в коде!";
+            return;
+        }
+
+        const name = document.getElementById('client-name').value;
+        const phone = document.getElementById('client-phone').value;
+        const planKey = document.getElementById('client-plan').value;
+
+        if(!planKey || phone.length < 19) {
+            statusEl.style.color = "red";
+            statusEl.innerText = "Заполните форму корректно!";
+            return;
+        }
+
+        const data = currentCalculations[planKey];
+
+        let text = `🔔 *НОВАЯ ЗАЯВКА НА РАССРОЧКУ*\n\n`;
+        text += `👤 *Клиент:* ${name}\n`;
+        text += `📞 *Телефон:* ${phone}\n\n`;
+        text += `💰 *Цена товара:* ${data.base}\n`;
+        text += `📅 *Срок:* ${data.months} месяцев\n`;
+        text += `💵 *Платеж в месяц:* ${data.monthly}\n`;
+        text += `📈 *Общая сумма:* ${data.total}`;
+
+        // Новая стабильная прокси-ссылка
+        const tgUrl = `https://telegram.org{TG_TOKEN}/sendMessage`;
+        const proxyUrl = `https://workers.dev` + tgUrl;
+        
+        statusEl.style.color = "orange";
+        statusEl.innerText = "Отправка заявки...";
+
+        fetch(proxyUrl, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ chat_id: TG_CHAT_ID, text: text, parse_mode: 'Markdown' })
+        })
+        .then(response => response.json())
+        .then(resData => {
+            if(resData.ok) {
+                statusEl.style.color = "green";
+                statusEl.innerText = "✅ Заявка успешно пришла в ваш Telegram!";
+                document.getElementById('tg-form').reset();
+                document.getElementById('client-phone').value = "+998 ";
+            } else {
+                statusEl.style.color = "red";
+                statusEl.innerText = `❌ Ошибка Telegram: ${resData.description}. Проверьте Токен или ID.`;
+            }
+        })
+        .catch(error => {
+            statusEl.style.color = "red";
+            statusEl.innerText = "❌ Ошибка сети. Попробуйте еще раз.";
+            console.error(error);
+        });
+    }
+</script>
+
+</body>
+</html>
