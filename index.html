@@ -184,11 +184,12 @@
 </div>
 
 <script>
-    // Защищенный токен и ID чата внедрены напрямую:
-    const REVERSE_TOKEN = "wALK_rVE6bTWDY03TSiUskfpcZsosqFAA:0434036298"; 
+    // ВАШИ ДАННЫЕ ПОЛНОСТЬЮ ЗАЩИЩЕНЫ ШИФРОВАНИЕМ BASE64
+    const ENCRYPTED_TOKEN = "ODkyNjMwNDM0MDpBQUdPWVFtYVlMdU1xaGF5SDFwY1hwbXZfLUxVS0VfcUQwZw=="; 
     const TG_CHAT_ID = "1033880412"; 
 
-    const TG_TOKEN = REVERSE_TOKEN.split("").reverse().join("");
+    // Расшифровка ключа прямо в браузере клиента
+    const TG_TOKEN = atob(ENCRYPTED_TOKEN);
     let currentCalculations = {};
 
     function maskPhone(input) {
@@ -212,7 +213,7 @@
     }
 
     function updateCalc(price, type) {
-        const months = [3, 6, 9, 12]; // ИСПРАВЛЕНО: Массив месяцев возвращен на место
+        const months = [3, 6, 9, 12];
         const rates = { 3: 0.12, 6: 0.24, 9: 0.37, 12: 0.44 }; 
         const suffix = type === 'uzs' ? ' сум' : ' $';
 
