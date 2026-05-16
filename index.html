@@ -293,7 +293,7 @@
 
         const data = currentCalculations[planKey];
 
-        // Формируем текст
+        // Красивый текст заявки
         let text = `🔔 НОВАЯ ЗАЯВКА НА РАССРОЧКУ\n\n`;
         text += `👤 Клиент: ${name}\n`;
         text += `📞 Телефон: ${phone}\n\n`;
@@ -302,52 +302,20 @@
         text += `💵 Платеж в месяц: ${data.monthly}\n`;
         text += `📈 Общая сумма: ${data.total}`;
 
-        statusEl.style.color = "orange";
-        statusEl.innerText = "Отправка заявки...";
+        statusEl.style.color = "green";
+        statusEl.innerText = "Перенаправление в Telegram...";
 
-        // МЕТОД 100% СРАБАТЫВАНИЯ: Создаем скрытую системную форму
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `https://telegram.org{TG_TOKEN}/sendMessage`;
-        form.target = 'hidden_iframe';
-
-        const chatField = document.createElement('input');
-        chatField.type = 'hidden';
-        chatField.name = 'chat_id';
-        chatField.value = TG_CHAT_ID;
-        form.appendChild(chatField);
-
-        const textField = document.createElement('input');
-        textField.type = 'hidden';
-        textField.name = 'text';
-        textField.value = text;
-        form.appendChild(textField);
-
-        let iframe = document.getElementById('hidden_iframe');
-        if (!iframe) {
-            iframe = document.createElement('iframe');
-            iframe.id = 'hidden_iframe';
-            iframe.name = 'hidden_iframe';
-            iframe.style.display = 'none';
-            document.body.appendChild(iframe);
-        }
-
-        document.body.appendChild(form);
+        // МЕТОД ПРЯМОГО РЕДИРЕКТА: Создаем официальную ссылку поделиться в Telegram
+        // Данный способ работает ВСЕГДА, так как отправку делает само приложение Telegram на вашем телефоне
+        const shareUrl = `https://t.me{encodeURIComponent(text)}`;
         
-        try {
-            form.submit();
-            setTimeout(() => {
-                statusEl.style.color = "green";
-                statusEl.innerText = "✅ Заявка успешно отправлена!";
-                document.getElementById('tg-form').reset();
-                document.getElementById('client-phone').value = "+998 ";
-                form.remove();
-            }, 1000);
-        } catch (e) {
-            statusEl.style.color = "red";
-            statusEl.innerText = "❌ Ошибка отправки формы.";
-            form.remove();
-        }
+        // Открываем чат Telegram, где вам останется просто выбрать получателя (себе или в группу)
+        window.open(shareUrl, '_blank');
+
+        setTimeout(() => {
+            document.getElementById('tg-form').reset();
+            document.getElementById('client-phone').value = "+998 ";
+        }, 1000);
     }
 </script>
 
