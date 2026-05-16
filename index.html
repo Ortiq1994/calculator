@@ -108,7 +108,9 @@
         .form-group label { text-align: left; margin-bottom: 5px; }
         .form-group input, .form-group select { font-size: 1rem; font-weight: 600; text-align: left; padding: 12px; }
 
+        /* Превращаем кнопку в полноценную открытую ссылку */
         .btn-submit {
+            display: block;
             width: 100%;
             padding: 15px;
             background: var(--tg-color);
@@ -121,12 +123,11 @@
             transition: background 0.2s;
             margin-top: 10px;
             text-align: center;
-            display: block;
             text-decoration: none;
+            box-sizing: border-box;
         }
 
         .btn-submit:hover { background: #0077b3; }
-        .status-msg { text-align: center; margin-top: 10px; font-weight: 600; font-size: 0.9rem; min-height: 20px; }
     </style>
 </head>
 <body>
@@ -166,23 +167,23 @@
 <!-- ФОРМА ЗАЯВКИ -->
 <div class="order-card">
     <h2>Оформить заявку</h2>
-    <form id="tg-form" onsubmit="sendToTelegram(event)">
+    <form id="tg-form" onsubmit="return false;">
         <div class="form-group">
             <label>Ваше имя</label>
-            <input type="text" id="client-name" placeholder="Имя Фамилия" required>
+            <input type="text" id="client-name" placeholder="Имя Фамилия" oninput="prepareLink()" required>
         </div>
         <div class="form-group">
             <label>Телефон</label>
-            <input type="text" id="client-phone" value="+998 " oninput="maskPhone(this)" onkeydown="checkBackspace(event, this)" required>
+            <input type="text" id="client-phone" value="+998 " oninput="maskPhone(this); prepareLink();" onkeydown="checkBackspace(event, this)" required>
         </div>
         <div class="form-group">
             <label>Выбранные условия</label>
-            <select id="client-plan" required>
+            <select id="client-plan" onchange="prepareLink()" required>
                 <option value="">Сначала введите сумму выше</option>
             </select>
         </div>
-        <button type="submit" class="btn-submit">Отправить в Telegram</button>
-        <div id="status" class="status-msg"></div>
+        <!-- Теперь кнопка — это обычная открытая ссылка <a> с атрибутом target="_blank" -->
+        <a href="#" id="tg-link" target="_blank" class="btn-submit">Отправить в Telegram</a>
     </form>
 </div>
 
@@ -199,6 +200,7 @@
         });
     }
 
+    // Запрет стирания кода оператора
     function checkBackspace(e, input) {
         if (input.selectionStart <= 5 && (e.key === "Backspace" || e.key === "Delete")) e.preventDefault();
     }
@@ -271,25 +273,23 @@
             opt.innerText = optionKey;
             selectPlan.appendChild(opt);
         });
+        prepareLink();
     }
 
-    function sendToTelegram(event) {
-        event.preventDefault();
-        const statusEl = document.getElementById('status');
-
+    // Функция, которая на лету собирает прямую текстовую ссылку
+    function prepareLink() {
         const name = document.getElementById('client-name').value;
         const phone = document.getElementById('client-phone').value;
         const planKey = document.getElementById('client-plan').value;
+        const linkEl = document.getElementById('tg-link');
 
-        if(!planKey || phone.length < 19) {
-            statusEl.style.color = "red";
-            statusEl.innerText = "Заполните форму корректно!";
+        if (!name || phone.length < 19 || !planKey) {
+            linkEl.href = "javascript:alert('Пожалуйста, сначала полностью заполните Имя, Номер телефона и выберите Условия рассрочки!')";
             return;
         }
 
         const data = currentCalculations[planKey];
 
-        // Собираем текст БЕЗ спецсимволов Markdown, чтобы ссылка была идеально чистой
         let text = `🔔 НОВАЯ ЗАЯВКА НА РАССРОЧКУ\n\n`;
         text += `👤 Клиент: ${name}\n`;
         text += `📞 Телефон: ${phone}\n\n`;
@@ -298,22 +298,8 @@
         text += `💵 Платеж в месяц: ${data.monthly}\n`;
         text += `📈 Общая сумма: ${data.total}`;
 
-        statusEl.style.color = "green";
-        statusEl.innerText = "Открытие Telegram...";
-
-        // МЕТОД 100% ДОСТАВКИ: Отправка через встроенную команду Telegram.
-        // Браузер генерирует прямую ссылку перехода. На телефоне мгновенно запустится приложение Telegram, 
-        // где этот готовый текст уже будет вставлен. Вам останется нажать кнопку «Отправить» внутри самого ТГ.
-        const shareUrl = "https://t.me" + encodeURIComponent(text);
-        
-        // Открываем официальный редирект в новой вкладке
-        window.open(shareUrl, '_blank');
-
-        setTimeout(() => {
-            document.getElementById('tg-form').reset();
-            document.getElementById('client-phone').value = "+998 ";
-            statusEl.innerText = "";
-        }, 1500);
+        // Привязываем готовый адрес к физической ссылке
+        linkEl.href = "https://t.me" + encodeURIComponent(text);
     }
 </script>
 
