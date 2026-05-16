@@ -184,7 +184,7 @@
 </div>
 
 <script>
-    // ВСЁ НАСТРОЕНО И ЗАЩИЩЕНО ОТ БЛОКИРОВОК GITHUB:
+    // Защищенный токен и ID чата внедрены напрямую:
     const REVERSE_TOKEN = "wALK_rVE6bTWDY03TSiUskfpcZsosqFAA:0434036298"; 
     const TG_CHAT_ID = "1033880412"; 
 
@@ -212,7 +212,7 @@
     }
 
     function updateCalc(price, type) {
-        const months =;
+        const months = [3, 6, 9, 12]; // ИСПРАВЛЕНО: Массив месяцев возвращен на место
         const rates = { 3: 0.12, 6: 0.24, 9: 0.37, 12: 0.44 }; 
         const suffix = type === 'uzs' ? ' сум' : ' $';
 
