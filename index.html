@@ -3,126 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Профессиональный калькулятор рассрочки</title>
+    <title>Личный VIP Калькулятор Рассрочки</title>
     <link href="https://googleapis.com" rel="stylesheet">
     <style>
         :root {
-            --bg: #f8fafc;
-            --uzs-color: #2563eb;
-            --usd-color: #d97706;
-            --text-dark: #1e293b;
-            --card-bg: #ffffff;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --uzs-neon: #38bdf8;
+            --usd-neon: #34d399;
         }
 
         body { 
             font-family: 'Inter', sans-serif; 
             background-color: var(--bg); 
+            color: var(--text-main);
             margin: 0; 
             display: flex; 
+            flex-direction: column;
             justify-content: center; 
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 30px 20px;
             box-sizing: border-box;
         }
 
+        .header-panel {
+            text-align: center;
+            margin-bottom: 30px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .header-panel h1 {
+            font-weight: 900;
+            font-size: 1.8rem;
+            margin: 0 0 15px 0;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, var(--uzs-neon), var(--usd-neon));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .rate-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 12px 20px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .rate-box label { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+        .rate-box input { width: 110px; padding: 6px; font-size: 1.1rem; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: var(--usd-neon); font-weight: 700; text-align: center; outline: none; }
+
         .container { 
             display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); 
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
             gap: 30px; 
             width: 100%; 
-            max-width: 1000px; 
+            max-width: 1050px; 
         }
 
         .calc-card { 
             background: var(--card-bg); 
             padding: 30px; 
-            border-radius: 24px; 
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-            border-top: 6px solid #ddd;
-            transition: transform 0.2s;
+            border-radius: 28px; 
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            position: relative;
         }
 
-        .calc-card:hover {
-            transform: translateY(-2px);
-        }
+        .calc-card.uzs { border-bottom: 4px solid var(--uzs-color); }
+        .calc-card.usd { border-bottom: 4px solid var(--usd-color); }
 
-        .calc-card.uzs { border-top-color: var(--uzs-color); }
-        .calc-card.usd { border-top-color: var(--usd-color); }
+        h2 { margin: 0 0 20px 0; font-weight: 700; font-size: 1.4rem; letter-spacing: -0.3px; }
+        .uzs h2 { color: var(--uzs-neon); }
+        .usd h2 { color: var(--usd-neon); }
 
-        h2 { margin: 0 0 25px 0; font-weight: 800; font-size: 1.5rem; color: var(--text-dark); text-align: center; }
+        .input-wrapper { margin-bottom: 25px; position: relative; }
 
-        .input-wrapper { margin-bottom: 30px; }
-
-        label { 
+        .input-wrapper label { 
             display: block; 
-            font-size: 0.85rem; 
-            font-weight: 600; 
-            color: #64748b; 
+            font-size: 0.8rem; 
+            font-weight: 700; 
+            color: var(--text-muted); 
             margin-bottom: 8px; 
             text-transform: uppercase;
-            text-align: center;
             letter-spacing: 0.5px;
         }
 
-        input { 
+        .input-wrapper input { 
             width: 100%; 
             padding: 16px; 
-            border: 2px solid #e2e8f0; 
+            border: 2px solid var(--border); 
             border-radius: 16px; 
             font-size: 1.6rem; 
             font-weight: 800; 
             box-sizing: border-box; 
             outline: none; 
             text-align: center;
-            background: #fcfcfd;
-            color: var(--text-dark);
-            transition: border-color 0.2s;
+            background: #111827;
+            color: var(--text-main);
+            transition: all 0.2s;
         }
 
-        input:focus { border-color: #cbd5e1; background: #fff; }
+        .uzs input:focus { border-color: var(--uzs-neon); box-shadow: 0 0 15px rgba(56, 189, 248, 0.15); }
+        .usd input:focus { border-color: var(--usd-neon); box-shadow: 0 0 15px rgba(52, 211, 153, 0.15); }
 
-        .results { display: flex; flex-direction: column; gap: 12px; }
+        .badge-info {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 6px;
+            font-weight: 500;
+            min-height: 15px;
+        }
+
+        .results { display: flex; flex-direction: column; gap: 14px; }
 
         .res-item { 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
             padding: 16px 20px; 
-            background: #f1f5f9; 
-            border-radius: 16px; 
+            background: #111827; 
+            border: 1px solid var(--border);
+            border-radius: 18px; 
+            transition: background 0.2s;
         }
 
-        .res-info { display: flex; flex-direction: column; }
-        .res-label { font-size: 0.95rem; font-weight: 700; color: #475569; }
-        .res-total { font-size: 0.8rem; color: #94a3b8; margin-top: 2px; }
-        .res-value { font-size: 1.3rem; font-weight: 800; text-align: right; }
+        .res-item:hover { background: #1f293d; }
 
-        .uzs .res-value { color: var(--uzs-color); }
-        .usd .res-value { color: var(--usd-color); }
+        .res-info { display: flex; flex-direction: column; }
+        .res-label { font-size: 0.95rem; font-weight: 700; color: var(--text-main); }
+        .res-total { font-size: 0.8rem; color: var(--text-muted); margin-top: 3px; font-weight: 500; }
+        .res-profit { font-size: 0.75rem; color: #fbbf24; margin-top: 2px; font-weight: 600; }
+
+        .res-value { font-size: 1.35rem; font-weight: 900; text-align: right; letter-spacing: -0.3px; }
+        .uzs .res-value { color: var(--uzs-neon); }
+        .usd .res-value { color: var(--usd-neon); }
 
         @media (max-width: 480px) {
-            body { padding: 10px; }
+            body { padding: 15px 10px; }
             .calc-card { padding: 20px; }
-            input { font-size: 1.3rem; }
+            .container { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
+
+<div class="header-panel">
+    <h1>Мой Личный Калькулятор</h1>
+    <div class="rate-box">
+        <label>Курс USD (сум):</label>
+        <input type="number" id="usd-rate" value="12850" oninput="recalcAll()">
+    </div>
+</div>
 
 <div class="container">
     <!-- БЛОК UZS -->
     <div class="calc-card uzs">
         <h2>Рассрочка UZS</h2>
         <div class="input-wrapper">
-            <label>Введите цену товара (сум)</label>
+            <label>Цена товара</label>
             <input type="text" id="input-uzs" placeholder="0" oninput="processInput(this, 'uzs')">
+            <div id="badge-uzs" class="badge-info"></div>
         </div>
         <div class="results">
-            <div class="res-item"><div class="res-info"><span class="res-label">3 месяца</span><span class="res-total" id="uzs-t3">Итого: 0 сум</span></div><div class="res-value" id="uzs-m3">0 сум</div></div>
-            <div class="res-item"><div class="res-info"><span class="res-label">6 месяцев</span><span class="res-total" id="uzs-t6">Итого: 0 сум</span></div><div class="res-value" id="uzs-m6">0 сум</div></div>
-            <div class="res-item"><div class="res-info"><span class="res-label">9 месяцев</span><span class="res-total" id="uzs-t9">Итого: 0 сум</span></div><div class="res-value" id="uzs-m9">0 сум</div></div>
-            <div class="res-item"><div class="res-info"><span class="res-label">12 месяцев</span><span class="res-total" id="uzs-t12">Итого: 0 сум</span></div><div class="res-value" id="uzs-m12">0 сум</div></div>
+            <div class="res-item"><div class="res-info"><span class="res-label">3 месяца</span><span class="res-total" id="uzs-t3">Итого: 0 сум</span><span class="res-profit" id="uzs-p3">Наценка: 0</span></div><div class="res-value" id="uzs-m3">0 сум</div></div>
+            <div class="res-item"><div class="res-info"><span class="res-label">6 месяцев</span><span class="res-total" id="uzs-t6">Итого: 0 сум</span><span class="res-profit" id="uzs-p6">Наценка: 0</span></div><div class="res-value" id="uzs-m6">0 сум</div></div>
+            <div class="res-item"><div class="res-info"><span class="res-label">9 месяцев</span><span class="res-total" id="uzs-t9">Итого: 0 сум</span><span class="res-profit" id="uzs-p9">Наценка: 0</span></div><div class="res-value" id="uzs-m9">0 сум</div></div>
+            <div class="res-item"><div class="res-info"><span class="res-label">12 месяцев</span><span class="res-total" id="uzs-t12">Итого: 0 сум</span><span class="res-profit" id="uzs-p12">Наценка: 0</span></div><div class="res-value" id="uzs-m12">0 сум</div></div>
         </div>
     </div>
 
@@ -130,71 +185,105 @@
     <div class="calc-card usd">
         <h2>Рассрочка USD</h2>
         <div class="input-wrapper">
-            <label>Введите цену товара ($)</label>
+            <label>Цена товара ($)</label>
             <input type="text" id="input-usd" placeholder="0" oninput="processInput(this, 'usd')">
+            <div id="badge-usd" class="badge-info"></div>
         </div>
         <div class="results">
-            <div class="res-item"><div class="res-info"><span class="res-label">3 месяца</span><span class="res-total" id="usd-t3">Итого: 0 $</span></div><div class="res-value" id="usd-m3">0 $</div></div>
+            <div class="res-item"><div class="res-info"><span class="res-label">3 месяца</span><span class="res-total" id="usd-t3">Итого: 0 $</span><span class="res-profit" id="usd-p3">Наценка: 0</span></div><div class="res-value" id="usd-m3">0 $</div></div>
             <div class="res-item"><div class="res-info"><span class="res-label">6 месяцев</span><span class="res-total" id="usd-t6">Итого: 0 $</span></div><div class="res-value" id="usd-m6">0 $</div></div>
-            <div class="res-item"><div class="res-info"><span class="res-label">9 месяцев</span><span class="res-total" id="usd-t9">Итого: 0 $</span></div><div class="res-value" id="usd-m9">0 $</div></div>
-            <div class="res-item"><div class="res-info"><span class="res-label">12 месяцев</span><span class="res-total" id="usd-t12">Итого: 0 $</span></div><div class="res-value" id="usd-m12">0 $</div></div>
+            <div class="res-item"><div class="res-info"><span class="res-label">9 месяцев</span><span class="res-total" id="usd-t9">Итого: 0 $</span><span class="res-profit" id="usd-p9">Наценка: 0</span></div><div class="res-value" id="usd-m9">0 $</div></div>
+            <div class="res-item"><div class="res-info"><span class="res-label">12 месяцев</span><span class="res-total" id="usd-t12">Итого: 0 $</span><span class="res-profit" id="usd-p12">Наценка: 0</span></div><div class="res-value" id="usd-m12">0 $</div></div>
         </div>
     </div>
 </div>
 
 <script>
+    let currentInputType = 'uzs';
+
     function processInput(el, type) {
+        currentInputType = type;
         let val = el.value.replace(/\s/g, '').replace(/\D/g, '');
         el.value = val !== "" ? Number(val).toLocaleString('ru-RU') : "";
         updateCalc(Number(val), type);
     }
 
+    function recalcAll() {
+        let uzsEl = document.getElementById('input-uzs');
+        let usdEl = document.getElementById('input-usd');
+        if (currentInputType === 'uzs' && uzsEl.value !== "") {
+            updateCalc(Number(uzsEl.value.replace(/\s/g, '')), 'uzs');
+        } else if (currentInputType === 'usd' && usdEl.value !== "") {
+            updateCalc(Number(usdEl.value.replace(/\s/g, '')), 'usd');
+        }
+    }
+
     function updateCalc(price, type) {
-        const months = [3, 6, 9, 12];
+        const months =;
         const rates = { 3: 0.12, 6: 0.24, 9: 0.37, 12: 0.44 }; 
         const suffix = type === 'uzs' ? ' сум' : ' $';
+        const rateUSD = Number(document.getElementById('usd-rate').value) || 0;
 
-        // Автоочистка противоположного поля ввода
         if(price > 0) {
             const otherType = type === 'uzs' ? 'usd' : 'uzs';
             document.getElementById(`input-${otherType}`).value = "";
+            document.getElementById(`badge-${otherType}`).innerText = "";
             months.forEach(m => {
                 document.getElementById(`${otherType}-m${m}`).innerText = '0' + (otherType === 'uzs' ? ' сум' : ' $');
-                document.getElementById(`${otherType}-t${m}`).innerText = 'Итого: 0 ' + (otherType === 'uzs' ? 'сум' : '$');
+                document.getElementById(`${otherType}-t${m}`).innerText = 'Итого: 0';
+                document.getElementById(`${otherType}-p${m}`).innerText = 'Наценка: 0';
             });
         }
+
+        // Подсказка наценки под инпутом
+        const badge = document.getElementById(`badge-${type}`);
+        let priceWithFee = 0;
+        let baseFeeText = "";
+
+        if (!price || price <= 0) {
+            if(badge) badge.innerText = "";
+            months.forEach(m => {
+                document.getElementById(`${type}-m${m}`).innerText = '0' + suffix;
+                document.getElementById(`${type}-t${m}`).innerText = 'Итого: 0' + suffix;
+                document.getElementById(`${type}-p${m}`).innerText = 'Переплата: 0';
+            });
+            return;
+        }
+
+        if (type === 'uzs') {
+            let add = price <= 2000000 ? 50000 : (price <= 5000000 ? 100000 : 150000);
+            priceWithFee = price + add;
+            baseFeeText = `Фикс добавка: +${add.toLocaleString('ru-RU')} сум`;
+        } else {
+            let r = price <= 2000000 ? 0.01 : (price <= 5000000 ? 0.015 : 0.02);
+            priceWithFee = price * (1 + r);
+            baseFeeText = `Процентная добавка: +${(r * 100).toFixed(1)}% | В сумах по курсу: ~ ${(Math.round(price * rateUSD)).toLocaleString('ru-RU')} сум`;
+        }
+        badge.innerText = baseFeeText;
 
         months.forEach(m => {
             const mEl = document.getElementById(type + '-m' + m);
             const tEl = document.getElementById(type + '-t' + m);
+            const pEl = document.getElementById(type + '-p' + m);
 
-            if (!price || price <= 0) {
-                mEl.innerText = '0' + suffix;
-                tEl.innerText = 'Итого: 0 ' + (type === 'uzs' ? 'сум' : '$');
-                return;
-            }
-
-            // Ваша точная логика наценок
-            let priceWithFee = 0;
-            if (type === 'uzs') {
-                let add = price <= 2000000 ? 50000 : (price <= 5000000 ? 100000 : 150000);
-                priceWithFee = price + add;
-            } else {
-                let r = price <= 2000000 ? 0.01 : (price <= 5000000 ? 0.015 : 0.02);
-                priceWithFee = price * (1 + r);
-            }
-
-            // Расчет с процентами: 12%, 24%, 37%, 44%
             let exactTotal = priceWithFee * (1 + rates[m]);
             let exactMonthly = exactTotal / m;
             
-            // Округление вверх: для UZS до 5 000 сум, для USD до 5 $
             let step = type === 'uzs' ? 5000 : 5;
             let roundedMonthly = Math.ceil(exactMonthly / step) * step;
             let finalTotal = roundedMonthly * m;
+            let overpayment = finalTotal - price; // Считаем чистую переплату относительно базовой цены
 
             mEl.innerText = roundedMonthly.toLocaleString('ru-RU') + suffix;
-            tEl.innerText = 'Итого: ' + finalTotal.toLocaleString('ru-RU') + suffix;
+            
+            // Если считаем в USD, добавим микро-инфо по общей сумме в сумах для удобства
+            let conversionText = "";
+            if (type === 'usd' && rateUSD > 0) {
+                conversionText = ` (~ ${Math.round(finalTotal * rateUSD).toLocaleString('ru-RU')} сум)`;
+            }
+
+            tEl.innerText = 'Итого: ' + finalTotal.toLocaleString('ru-RU') + suffix + conversionText;
+            pEl.innerText = 'Чистая наценка: ' + Math.round(overpayment).toLocaleString('ru-RU') + suffix;
         });
     }
 </script>
